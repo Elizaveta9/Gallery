@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Gallery">
         <activity
-            android:name=".cell"
+            android:name=".Cell"
             android:exported="true" />
         <activity
             android:name=".MainActivity"
