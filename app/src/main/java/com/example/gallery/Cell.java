@@ -2,13 +2,23 @@ package com.example.gallery;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.os.Bundle;
+public class Cell {
+    private String title;
+    private String path;
 
-public class Cell extends AppCompatActivity {
+    public String getTitle() {
+        return title;
+    }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_cell);
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 }
