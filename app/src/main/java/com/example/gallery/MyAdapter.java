@@ -18,10 +18,10 @@ import java.util.ArrayList;
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
     private ArrayList<Image> galleryList;
     private Context context;
-    String paths;
+    ArrayList<String> paths;
     public ImageView img;
 
-    public MyAdapter(Context context, ArrayList<Image> galleryList, String paths) {
+    public MyAdapter(Context context, ArrayList<Image> galleryList, ArrayList<String> paths) {
         this.paths = paths;
         this.context = context;
         this.galleryList = galleryList;

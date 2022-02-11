@@ -23,8 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    String allFilesPaths;
     ArrayList<Image> allFiles;
+    ArrayList<String> allFilesPaths = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Создание строки со всеми путями
         for (int i = 0; i < allFiles.size(); i++) {
-            allFilesPaths += allFiles.get(i).getPath() + "§";
+            allFilesPaths.add(allFiles.get(i).getPath());
         }
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.gallery);

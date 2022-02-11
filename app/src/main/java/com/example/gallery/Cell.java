@@ -7,12 +7,12 @@ import android.widget.ImageView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.File;
+import java.util.ArrayList;
 
 public class Cell extends AppCompatActivity{
     ImageView imageView;
     int index;
-    String paths;
-    String[] pathsArr;
+    ArrayList<String> pathsArr;
     Bundle arguments;
 
     @Override
@@ -22,8 +22,7 @@ public class Cell extends AppCompatActivity{
         imageView = findViewById(R.id.img);
         arguments = getIntent().getExtras();
         index = arguments.getInt("Index");
-        paths = arguments.getString("Paths");
-        pathsArr = paths.split("§");
+        pathsArr = arguments.getStringArrayList("Paths");
         setImageFromPath(arguments.getString("Image"), imageView);
 
 
