@@ -1,24 +1,39 @@
 package com.example.gallery;
 
+import android.graphics.Bitmap;
+import android.os.Bundle;
+import android.widget.ImageView;
+
 import androidx.appcompat.app.AppCompatActivity;
 
-public class Cell {
-    private String title;
-    private String path;
+import java.io.File;
 
-    public String getTitle() {
-        return title;
+public class Cell extends AppCompatActivity{
+    ImageView imageView;
+    int index;
+    String paths;
+    String[] pathsArr;
+    Bundle arguments;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_cell);
+        imageView = findViewById(R.id.img);
+        arguments = getIntent().getExtras();
+        index = arguments.getInt("Index");
+        paths = arguments.getString("Paths");
+        pathsArr = paths.split("§");
+        setImageFromPath(arguments.getString("Image"), imageView);
+
+
+    }
+    private void setImageFromPath(String path, ImageView image) {
+        File imgFile = new File(path);
+        if (imgFile.exists()) {
+            Bitmap myBitmap = ImageHelper.decodeSampleBitmapFromPath(imgFile.getAbsolutePath(), 1000, 1000);
+            image.setImageBitmap(myBitmap);
+        }
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
-    }
 }

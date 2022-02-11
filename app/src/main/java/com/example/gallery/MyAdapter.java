@@ -1,6 +1,8 @@
 package com.example.gallery;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -14,46 +16,45 @@ import java.io.File;
 import java.util.ArrayList;
 
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
-    private ArrayList<Cell> galleryList;
+    private ArrayList<Image> galleryList;
     private Context context;
+    String paths;
+    public ImageView img;
 
-    // Provide a suitable constructor (depends on the kind of dataset)
-    public MyAdapter(Context context, ArrayList<Cell> galleryList) {
+    public MyAdapter(Context context, ArrayList<Image> galleryList, String paths) {
+        this.paths = paths;
         this.context = context;
         this.galleryList = galleryList;
     }
 
-    // Create new views (invoked by the layout manager)
+    // Создание нового объекта View
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent,
-                                         int viewType) {
-        // create a new view
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.activity_cell, parent, false);
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_cell, parent, false);
         return new ViewHolder(view);
     }
-    // Replace the contents of a view (invoked by the layout manager)
+
+    // Меняет контент объкта View
     @Override
-    public void onBindViewHolder(ViewHolder viewHolder, final int position) {
-        // - get element from your dataset at this position
-        // - replace the contents of the view with that element
+    public void onBindViewHolder(ViewHolder viewHolder, @SuppressLint("RecyclerView") final int position) {
         viewHolder.img.setScaleType(ImageView.ScaleType.CENTER_CROP);
         setImageFromPath(galleryList.get(position).getPath(), viewHolder.img);
         viewHolder.img.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO что-то может происходить, если кликнуть на изображение
-                Toast.makeText(context, "" + galleryList.get(position).getTitle(), Toast.LENGTH_SHORT).show();
+                img = v.findViewById(R.id.img);
+                Intent intent = new Intent(v.getContext(), Cell.class);
+                intent.putExtra("Index", position);
+                intent.putExtra("Image", galleryList.get(position).getPath());
+                intent.putExtra("Paths", paths);
+                v.getContext().startActivity(intent);
+                Toast.makeText(context, galleryList.get(position).getTitle(), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    // Provide a reference to the views for each data item
-    // Complex data items may need more than one view per item, and
-    // you provide access to all the views for a data item in a view holder
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        // each data item is just a string in this case
         public ImageView img;
 
         public ViewHolder(View view) {
@@ -62,8 +63,6 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         }
     }
 
-
-    // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
         return galleryList.size();

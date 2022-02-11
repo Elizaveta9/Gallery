@@ -2,6 +2,8 @@ package com.example.gallery;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import androidx.annotation.NonNull;
@@ -9,6 +11,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.provider.ContactsContract;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -17,7 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    List<Cell> allFilesPaths;
+    String allFilesPaths;
+    ArrayList<Image> allFiles;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,14 +38,49 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     private void showImages() {
-        //папка со всеми изображениями
-        String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Images/";
-        allFilesPaths = new ArrayList<>();
-        allFilesPaths = listAllFiles(path);
+
+        // Получение URI хранилища
+        Uri uriImages = android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+
+        String[] projection = {
+                MediaStore.Images.ImageColumns.DATA,
+                MediaStore.Images.Media.DISPLAY_NAME,
+                MediaStore.Images.Media.BUCKET_DISPLAY_NAME, // BUCKET_DISPLAY_NAME - имя папки где хранятся картинки, например "Camera"
+                MediaStore.Images.Media.BUCKET_ID // BUCKET_ID - hash код той папки
+        };
+
+        // Создание "курсора" перебирающего содержимое результата запроса базы данных
+        Cursor cursor = this.getContentResolver().
+                query(uriImages, projection, null, null); // Запрос к базе данных
+
+        try {
+            int count = 0;
+            allFiles = new ArrayList<>();
+            if (cursor != null) {
+                cursor.moveToFirst(); // Ставит курсор на первый ряд
+            }
+            do {
+                Image path = new Image();
+                path.setTitle(cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME)));
+                path.setPath(cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)));
+                count++;
+                allFiles.add(path);
+            }
+            while (cursor.moveToNext() && count < 18);
+            cursor.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // Создание строки со всеми путями
+        for (int i = 0; i < allFiles.size(); i++) {
+            allFilesPaths += allFiles.get(i).getPath() + "§";
+        }
+
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.gallery);
-        recyclerView.setHasFixedSize(true);
-        // список в три колонки
-        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getApplicationContext(), 3);
+
+        // список в две колонки
+        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getApplicationContext(), 2);
         recyclerView.setLayoutManager(layoutManager);
 
         //оптимизация
@@ -46,51 +88,13 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setDrawingCacheEnabled(true);
         recyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
 
-        ArrayList<Cell> cells = prepareDate();
-        MyAdapter adapter = new MyAdapter(getApplicationContext(), cells);
+        MyAdapter adapter = new MyAdapter(getApplicationContext(), allFiles, allFilesPaths);
         recyclerView.setAdapter(adapter);
-    }
-
-    /**
-     * Подготовка изображений для списка
-     *
-     * @return список
-     */
-    private ArrayList<Cell> prepareDate() {
-        ArrayList<Cell> allImages = new ArrayList<>();
-        for (Cell c : allFilesPaths) {
-            Cell cell = new Cell();
-            cell.setTitle(c.getTitle());
-            cell.setPath(c.getPath());
-            allImages.add(cell);
-        }
-        return allImages;
-    }
-
-
-    /**
-     * Загружает список файлов из папки
-     *
-     * @param pathName имя папки
-     * @return список
-     */
-    private List<Cell> listAllFiles(String pathName) {
-        List<Cell> allFiles = new ArrayList<>();
-        File file = new File(pathName);
-        File[] files = file.listFiles();
-        if (files != null) {
-            for (File f : files) {
-                Cell cell = new Cell();
-                cell.setTitle(f.getName());
-                cell.setPath(f.getAbsolutePath());
-                allFiles.add(cell);
-            }
-        }
-        return allFiles;
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == 1000) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 showImages();
