@@ -5,26 +5,23 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Environment;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.provider.ContactsContract;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     ArrayList<Image> allFiles;
     ArrayList<String> allFilesPaths = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
             showImages();
         }
     }
+
     private void showImages() {
 
         // Получение URI хранилища
@@ -60,11 +58,11 @@ public class MainActivity extends AppCompatActivity {
                 cursor.moveToFirst(); // Ставит курсор на первый ряд
             }
             do {
-                Image path = new Image();
-                path.setTitle(cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME)));
-                path.setPath(cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)));
+                Image image = new Image();
+                image.setTitle(cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME)));
+                image.setPath(cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)));
                 count++;
-                allFiles.add(path);
+                allFiles.add(image);
             }
             while (cursor.moveToNext() && count < 18);
             cursor.close();
