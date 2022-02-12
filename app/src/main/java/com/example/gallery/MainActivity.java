@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        // Создание строки со всеми путями
+        // Создание массива со всеми путями
         for (int i = 0; i < allFiles.size(); i++) {
             allFilesPaths.add(allFiles.get(i).getPath());
         }
